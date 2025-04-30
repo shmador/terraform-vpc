@@ -44,3 +44,19 @@ This Terraform configuration deploys a production-ready VPC with the following f
              Access                  Access               Access
          (via NAT GW)            (via NAT GW)         (via NAT GW)
 
+
+- **Public Subnet (10.0.1.0/24 @ AZ a)**  
+  - Hosts the **Internet Gateway** and **NAT Gateway**  
+  - Automatically assigns public IPs  
+  - Allows direct inbound & outbound internet traffic  
+
+- **Private Subnets (10.0.2.0/24 @ AZ b, 10.0.3.0/24 @ AZ c)**  
+  - No public IPs  
+  - Route all outbound traffic through the **NAT Gateway** in the public subnet  
+  - Fully isolated from direct inbound internet access  
+
+This design ensures:
+- **High availability** across three AZs  
+- **Public resources** (NAT, bastion, web services) reach the internet directly  
+- **Private resources** (databases, internal apps) can only initiate outbound connections  
+
