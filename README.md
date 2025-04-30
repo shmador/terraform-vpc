@@ -11,4 +11,36 @@ This Terraform configuration deploys a production-ready VPC with the following f
 
 ## Architecture Overview
 
-┌─────────────────────────────────────────────────────────┐ │ VPC 10.0.0.0/16 │ │ │ │ ┌───────────────────────┐ ┌───────────────────────┐ │ │ │ Public Subnet │ │ Private Subnet 1 │ │ │ │ 10.0.1.0/24 (AZ a) │◄─► IGW│ 10.0.2.0/24 (AZ b) │ │ │ │ NAT Gateway + EIP │ │ NAT via public subnet │ │ │ └───────────────────────┘ └───────────────────────┘ │ │ ▲ │ │ │ │ │ ┌───────────────────────┐ │ │ │ │ Private Subnet 2 │────────────┘ │ │ │ 10.0.3.0/24 (AZ c) │ NAT via public subnet │ │ └───────────────────────┘ │ └─────────────────────────────────────────────────────────┘
+                                 ┌───────────────┐
+                                 │   Internet    │
+                                 └──────┬────────┘
+                                        │
+                                  (via IGW)
+                                        │
+                               ┌────────▼────────┐
+                               │ Internet Gateway│
+                               └────────┬────────┘
+                                        │
+                                        │
+                               ┌────────▼────────┐
+                               │    Public Subnet │
+                               │    10.0.1.0/24   │
+                               │ Availability AZa │
+                               │ map_public_ip_on_launch
+                               └────────┬────────┘
+                                        │
+                   ┌────────────────────┼────────────────────┐
+                   │                    │                    │
+                   │                    │                    │
+        ┌──────────▼────────┐ ┌─────────▼────────┐ ┌────────▼────────┐
+        │ NAT Gateway + EIP │ │ Private Subnet 1 │ │ Private Subnet 2 │
+        │ (in Public Subnet)│ │   10.0.2.0/24    │ │   10.0.3.0/24    │
+        │ Availability AZa  │ │ Availability AZb │ │ Availability AZc │
+        └──────────┬────────┘ └─────────┬────────┘ └────────┬────────┘
+                   │                    │                    │
+                   │                    │                    │
+             Outbound            Outbound only         Outbound only
+            Internet                Internet              Internet
+             Access                  Access               Access
+         (via NAT GW)            (via NAT GW)         (via NAT GW)
+
