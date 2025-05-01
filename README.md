@@ -2,10 +2,17 @@
 
 This Terraform configuration deploys a production-ready VPC with the following features:
 
-- **Public subnet** with an Internet Gateway  
-- **Two private subnets**, each routed through a NAT Gateway in the public subnet  
-- Subnets spread across **multiple Availability Zones** (`il-central-1a`, `il-central-1b`, `il-central-1c`) for high availability  
-- Tags and naming conventions to keep resources organized  
+## Features
+
+- **VPC Setup**: Create a VPC with a CIDR block of `10.0.0.0/16`.
+- **Public Subnet**: A public subnet with an associated Internet Gateway (IGW) to allow internet access.
+- **Private Subnets**: Two private subnets, each in separate Availability Zones (AZ), with a NAT Gateway deployed in the public subnet to allow private subnets to access the internet securely.
+- **High Availability**: Resources are distributed across multiple Availability Zones to ensure high uptime for production workloads.
+- **EC2 Instance on the Public Subnet**:  
+  - Deployed on the public subnet.  
+  - Has an **SSH security group** allowing access.  
+  - Uses a **new key pair** for secure SSH access.  
+  - Runs **custom userdata scripts** for initialization on launch.
 
 ---
 
